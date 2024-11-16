@@ -9,10 +9,14 @@ const int height = 13;
 
 const int max_lenght_snake = (width - 3) * (height - 2);
 
-const int up = 0;
-const int down = 1;
-const int LEFT = 2;
-const int RIGHT = 3;
+enum Direction
+{
+    up,
+    down,
+    LEFT,
+    RIGHT
+};
+
 
 char snake = 'O';
 char food = '*';
@@ -80,6 +84,7 @@ int main()
     snake_x[0] = width / 2;
     snake_y[0] = height / 2;
 
+
     int time1 = clock();
     while(Game)
     {
@@ -104,9 +109,9 @@ int main()
             if (snake_x[0] == food_x && snake_y[0] == food_y)
             {
                 ++snake_len;
-                srand(time(0));
-                int food_x = 1 + (rand() % (width - 3));
-                int food_y = 1 + (rand() % (height - 2));
+                // srand(time(0));
+                food_x = 1 + (rand() % (width - 3));
+                food_y = 1 + (rand() % (height - 2));
             }
             
 			for (int i = snake_len - 2; i >= 0; --i)
