@@ -4,11 +4,37 @@
 
 using namespace std;
 
-const int width = 26;
-const int height = 13;
+bool Game = true;
+
+const int width = 41;
+const int height = 20;
+char map[] = 
+"########################################\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"#                                      #\n"
+"########################################\n";
 
 const int max_lenght_snake = (width - 3) * (height - 2);
-
+char snake = 'O';
+int snake_x[max_lenght_snake] = {0};
+int snake_y[max_lenght_snake] = {0};
+int snake_len = 1;
 enum Direction
 {
     up,
@@ -16,56 +42,37 @@ enum Direction
     LEFT,
     RIGHT
 };
-
-
-char snake = 'O';
-char food = '*';
-
 int snake_dir = up;
 
-bool Game = true;
+class Food
+{
+    public:
+        void SetFoodPosition_x()
+        {
+            food_x = 1 + (rand() % (width - 3));
+        }
+        void SetFoodPosition_y()
+        {
+            food_y = 1 + (rand() % (height - 2));
+        }
+        int GetFoodPosition_x()
+        {
+            return food_x;
+        }
+        int GetFoodPosition_y()
+        {
+            return food_y;
+        }
+        int DrawFood()
+        {
+            return food;
+        }
 
-
-int snake_x[max_lenght_snake] = {0};
-int snake_y[max_lenght_snake] = {0};
-int snake_len = 1;
-
-
-char map[] = 
-"#########################\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#                       #\n"
-"#########################\n";
-// "########################################\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "#                                      #\n"
-// "########################################\n";
+    private:
+        int food_x = 1 + (rand() % (width - 3));
+        int food_y = 1 + (rand() % (height - 2));
+        char food = '*';
+};
 
 void gotoxy(int x, int y)
 {
@@ -74,13 +81,9 @@ void gotoxy(int x, int y)
     SetConsoleCursorPosition(output, pos);
 }
 
-
-int food_x = 1 + (rand() % (width - 3));
-int food_y = 1 + (rand() % (height - 2));
-
-
 int main()
 {
+    Food apple;
     snake_x[0] = width / 2;
     snake_y[0] = height / 2;
 
@@ -106,12 +109,11 @@ int main()
         if ((clock() - time1) / CLOCKS_PER_SEC >= 1) 
 		{
             time1 = clock();
-            if (snake_x[0] == food_x && snake_y[0] == food_y)
+            if (snake_x[0] == apple.GetFoodPosition_x() && snake_y[0] == apple.GetFoodPosition_y())
             {
                 ++snake_len;
-                // srand(time(0));
-                food_x = 1 + (rand() % (width - 3));
-                food_y = 1 + (rand() % (height - 2));
+                apple.SetFoodPosition_x();
+                apple.SetFoodPosition_y();
             }
             
 			for (int i = snake_len - 2; i >= 0; --i)
@@ -150,7 +152,7 @@ int main()
                 }
             }
             gotoxy(0, 0);
-            map[food_y * width + food_x] = food;
+            map[apple.GetFoodPosition_y() * width + apple.GetFoodPosition_x()] = apple.DrawFood();
             for(int i = 0; i < snake_len; ++i)
             {
                 map[snake_y[i] * width + snake_x[i]] = snake;
