@@ -30,11 +30,82 @@ char map[] =
 "#                                      #\n"
 "########################################\n";
 
-const int max_lenght_snake = (width - 3) * (height - 2);
-char snake = 'O';
-int snake_x[max_lenght_snake] = {0};
-int snake_y[max_lenght_snake] = {0};
-int snake_len = 1;
+class Snake
+{
+    public:
+        
+        int DrawSnake()
+        {
+            return snake;
+        }
+        void GrowSnake()
+        {
+            if (snake_len < max_lenght_snake)
+            {
+                snake_len++;
+            }
+        }
+        int GetSnakeLenght()
+        {
+            return snake_len;
+        }
+        void SetSnakePosition()
+        {
+            snake_x[0] = width / 2;
+            snake_y[0] = height / 2;
+        }
+        int GetSnakeHeadPosition_x()
+        {
+            return snake_x[0];
+        }
+        int GetSnakeHeadPosition_y()
+        {
+            return snake_y[0];
+        }
+        int GetSnakeTailPosition_x(int i)
+        {
+            return snake_x[i];
+        }
+        int GetSnakeTailPosition_y(int i)
+        {
+            return snake_y[i];
+        }
+        void MoveSnakeHead_mx()
+        {
+            --snake_x[0];
+        }
+        void MoveSnakeHead_px()
+        {
+            ++snake_x[0];
+        }
+        void MoveSnakeHead_my()
+        {
+            --snake_y[0];
+        }
+        void MoveSnakeHead_py()
+        {
+            ++snake_y[0];
+        }
+        void UpdateSnakeBody()
+        {
+            for (int i = snake_len - 1; i > 0; --i)
+            {
+                snake_x[i] = snake_x[i - 1];
+                snake_y[i] = snake_y[i - 1];
+            }
+        }
+        
+
+    private:
+        char snake = 'O';
+        int max_lenght_snake = (width - 3) * (height - 2);    
+        int snake_x[(width - 3) * (height - 2)] = {0};
+        int snake_y[(width - 3) * (height - 2)] = {0};
+        int snake_len = 1;
+};
+
+
+
 enum Direction
 {
     up,
@@ -84,14 +155,14 @@ void gotoxy(int x, int y)
 int main()
 {
     Food apple;
-    snake_x[0] = width / 2;
-    snake_y[0] = height / 2;
+    Snake Spaghetti;
+    Spaghetti.SetSnakePosition();
 
-
+    srand(time(0));
     int time1 = clock();
     while(Game)
     {
-        srand(time(0));
+        
         if (GetKeyState('A') & 0x8000)
 			if (snake_dir != RIGHT)
 				snake_dir = LEFT;
@@ -109,62 +180,59 @@ int main()
         if ((clock() - time1) / CLOCKS_PER_SEC >= 1) 
 		{
             time1 = clock();
-            if (snake_x[0] == apple.GetFoodPosition_x() && snake_y[0] == apple.GetFoodPosition_y())
+            if (Spaghetti.GetSnakeHeadPosition_x() == apple.GetFoodPosition_x() && Spaghetti.GetSnakeHeadPosition_y() == apple.GetFoodPosition_y())
             {
-                ++snake_len;
+                Spaghetti.GrowSnake();
                 apple.SetFoodPosition_x();
                 apple.SetFoodPosition_y();
+                cout << Spaghetti.GetSnakeLenght();
             }
             
-			for (int i = snake_len - 2; i >= 0; --i)
-			{
-				snake_x[i + 1] = snake_x[i];
-				snake_y[i + 1] = snake_y[i];
-			}
-
-            if (snake_dir == 0)
+            Spaghetti.UpdateSnakeBody();
+            
+	        if (snake_dir == 0)
             {
-                --snake_y[0];
+                Spaghetti.MoveSnakeHead_my();
             }
             if (snake_dir == 1)
             {
-                ++snake_y[0];
+                 Spaghetti.MoveSnakeHead_py();
             }
             if (snake_dir == 2)
             {
-                --snake_x[0];
+                Spaghetti.MoveSnakeHead_mx();
             }
             if (snake_dir == 3)
             {
-                ++snake_x[0];
+                Spaghetti.MoveSnakeHead_px();
             }
 
-            if (snake_x[0] == 0 || snake_y[0] == 0 || snake_x[0] == width - 2 || snake_y[0] == height - 1)
+            if (Spaghetti.GetSnakeHeadPosition_x() == 0 || Spaghetti.GetSnakeHeadPosition_y() == 0 || Spaghetti.GetSnakeHeadPosition_x() == width - 2 || Spaghetti.GetSnakeHeadPosition_y() == height - 1)
             {
                 Game = false;
             }
-            for (int i = 1; i < snake_len; ++i)
+            for (int i = 1; i < Spaghetti.GetSnakeLenght(); ++i)
             {
-                if (snake_x[0] == snake_x[i] && snake_y[0] == snake_y[i])
+                if (Spaghetti.GetSnakeHeadPosition_x() == Spaghetti.GetSnakeTailPosition_x(i) && Spaghetti.GetSnakeHeadPosition_y() == Spaghetti.GetSnakeTailPosition_y(i))
                 {
                     Game = false;
-                    i = snake_len;
+                    i = Spaghetti.GetSnakeLenght();
                 }
             }
             gotoxy(0, 0);
             map[apple.GetFoodPosition_y() * width + apple.GetFoodPosition_x()] = apple.DrawFood();
-            for(int i = 0; i < snake_len; ++i)
+            for(int i = 0; i < Spaghetti.GetSnakeLenght(); ++i)
             {
-                map[snake_y[i] * width + snake_x[i]] = snake;
+                map[Spaghetti.GetSnakeTailPosition_y(i) * width + Spaghetti.GetSnakeTailPosition_x(i)] = Spaghetti.DrawSnake();
             }
             cout << map;
-            for(int i = 0; i < snake_len; ++i)
+            for(int i = 0; i < Spaghetti.GetSnakeLenght(); ++i)
             {
-                map[snake_y[i] * width + snake_x[i]] = ' ';
+                map[Spaghetti.GetSnakeTailPosition_y(i) * width + Spaghetti.GetSnakeTailPosition_x(i)] = ' ';
             }
         }
     }
     gotoxy(1, height / 2);
-    cout << "Score: " << snake_len << endl;
+    cout << "Score: " << Spaghetti.GetSnakeLenght() << endl;
     gotoxy(width, height);
 }
